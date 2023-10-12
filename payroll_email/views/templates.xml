@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Payroll Report -->
+        <!--        <record id="action_report_payroll" model="ir.actions.report">-->
+        <!--            <field name="name">Payroll</field>-->
+        <!--            <field name="model">hr.payslip</field>-->
+        <!--            <field name="report_type">qweb-pdf</field>-->
+        <!--            <field name="report_name">payroll_email.report_payroll</field>-->
+        <!--            <field name="report_file">payroll_email.report_payroll</field>-->
+        <!--            <field name="binding_model_id" ref="payroll_email.model_hr_payslip"/>-->
+        <!--        </record>-->
+
+
+        <!-- Payroll Report Template -->
+        <template id="report_payroll">
+            <t t-call="web.html_container">
+                <t t-set="o" t-value="o"/>
+
+                <div class="page">
+                    <t t-call="payroll_email.header_layout">
+
+                        <h3>Payslip</h3>
+                        <div >
+                           <br/>
+                            <span style="margin-bottom:2px;font-weight: bold;">Employee Name:
+                            </span>
+                            <span t-field="o.employee_id.name"/>
+                            <br/>
+                            <span style="margin-bottom:2px;font-weight: bold;">Designation:
+                            </span>
+                            <span t-field="o.employee_id.job_title"/>
+                            <br/>
+                        </div>
+                        <div >
+                            <span style="margin-bottom:2px;font-weight: bold;">Bank Account:
+                            </span>
+                            <span t-field="o.employee_id.address_home_id.bank_ids.acc_number"/>
+                            <br/>
+                            <span style="margin-bottom:2px;font-weight: bold;">Unpaid Leaves:
+                            </span>
+                            <span class="text-capitalize" t-esc="o._context.get('unpaid')"/>
+                            <br/>
+                             <span style="margin-bottom:2px;font-weight: bold;">Attendance:
+                            </span>
+                            <span class="text-capitalize" t-esc="o._context.get('working')"/>
+                            <br/>
+                             <span style="margin-bottom:2px; font-weight: bold;">Date:
+                            </span>
+                            <span t-field="o.date_from" t-options="{'date': 'short'}"/>
+                            <br/>
+                        </div>
+                        <br/>
+                        <br/>
+
+                        <table class="table table-bordered table-sm">
+                            <tr style="background-color: #F5F7F9;font-weight: bold;">
+                                <td>Description</td>
+                                <td>Category</td>
+                                <td>Amount</td>
+                            </tr>
+                            <tr t-foreach="o.line_ids" t-as="line">
+                                <td style="width:50px;height:30px">
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td style="width:50px;height:30px">
+                                    <span t-field="line.category_id.name"/>
+                                </td>
+                                <td style="width:50px;height:10px">
+                                    <span t-field="line.amount"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </t>
+
+                </div>
+            </t>
+        </template>
+
+        <template id="report_generate_employee_offer_letter">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="payroll_email.report_payroll" lang="en_US"/>
+                </t>
+                <div>
+                </div>
+            </t>
+        </template>
+
+
+        <record id="email_advance_salary_send" model="mail.template">
+            <field name="name">Advance Salary</field>
+            <field name="model_id" ref="payroll_email.model_advance_salary_account"/>
+            <field name="email_from">{{ (object.partner_id.email or user.email_formatted) }}</field>
+            <field name="subject">Advance Salary Confirmation</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.partner_id.name or ''">Employee</t>
+                        I hope this email finds you well. We would like to inform you that your request for an advance
+                        salary of amount Rs
+                        <t t-out="object.amount or ''"/>
+                        has been approved. We understand the importance of your financial needs and are pleased
+                        to assist you in this matter.
+
+                        The approved amount will be processed and disbursed to you shortly. You can expect the funds to
+                        be deposited into your designated bank account within one working day.
+
+
+                        Thank you for your dedication and hard work. We value your contribution to our team and look
+                        forward to your continued success at <t t-out="user.company_id.name"/>.
+
+                        <br/>
+                        <br/>
+
+                        Best Regards,
+                        <br/>
+                        <br/>
+
+                        <t t-out="user.company_id.name"/>
+                        <br/>
+                        <br/>
+                        <t t-out="user.company_id.phone"/>
+                        <br/>
+                        <br/>
+
+                    </p>
+                </div>
+            </field>
+        </record>
+
+
+        <record id="email_advance_salary_approved_send" model="mail.template">
+            <field name="name">Advance Salary</field>
+            <field name="model_id" ref="payroll_email.model_advance_salary_account"/>
+            <field name="email_from">{{ (object.partner_id.email or user.email_formatted) }}</field>
+            <field name="subject">Advance Salary Confirmation</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.partner_id.name or ''">Employee</t>
+
+                        <br/>
+                        <br/>
+                        This mail is let you know that Rs
+                        <t t-out="object.amount or ''"/>
+                        has be sent as advance salary.
+                        <br/>
+                        <br/>
+
+                        Best Regards,
+                        <br/>
+                        <br/>
+                        <t t-out="user.company_id.name"/>
+                        <br/>
+                        <br/>
+                        <t t-out="user.company_id.phone"/>
+                        <br/>
+                        <br/>
+                    </p>
+                </div>
+            </field>
+        </record>
+        <record id="email_payroll_send_to_employee" model="mail.template">
+            <field name="name">Salary Slip</field>
+            <field name="model_id" ref="payroll_email.model_hr_payslip"/>
+            <field name="email_from">{{ (object.employee_id.work_email or user.email_formatted) }}</field>
+            <field name="subject">Salary Slip</field>
+            <field name="partner_to">{{ object.employee_id.address_home_id.id }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear
+                        <t t-out="object.employee_id.name or ''">Employee</t>
+
+                        <br/>
+                        <br/>
+                        We hope this email finds you well. We are pleased to share your payslip for the month of
+                        <t t-out="object.date_from or ''"/>
+                        Please find the attached payslip document to this email. It contains a comprehensive breakdown
+                        of your earnings, deductions, and other relevant details for the specified period.
+
+                        If you have any queries or require clarification regarding the information presented in the
+                        payslip, please feel free to contact our HR department. We are here to assist you and provide
+                        any necessary information.
+
+                        Thank you for your continued dedication and hard work at MountSol. We appreciate your
+                        contribution to our success.
+
+                        <br/>
+                        <br/>
+
+                        Best Regards,
+                        <br/>
+                        <br/>
+
+                        <t t-out="user.company_id.name"/>
+                        <br/>
+                        <br/>
+                        <t t-out="user.company_id.phone"/>
+                        <br/>
+                        <br/>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+
+</odoo>
+
+
+
+
+
+
+
+

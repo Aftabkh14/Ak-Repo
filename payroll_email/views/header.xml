@@ -1,0 +1,46 @@
+<odoo>
+    <template id="header_layout">
+        <div class="header">
+            <div class="row" style="report_header_style">
+                <div>
+                    <img class="image" src="/payroll_email/static/src/img/logo.png" width="200px"/>
+                </div>
+<!--                <div>-->
+<!--                    <img class="image" src="/reports_handling/static/src/img/gyptech.jpg" width="850px"/>-->
+<!--                </div>-->
+            </div>
+        </div>
+        <div class="article o_report_layout_standard">
+<!--            <div style="position:absolute; opacity:0.35; text-align:center; z-index:999; padding-top:330px; padding-left:145px;">-->
+<!--                <img class="image" style="border: None; " src="/reports_handling/static/src/img/watermark.png"-->
+<!--                     width="500px"-->
+<!--                     height="500px"/>-->
+<!--            </div>-->
+            <t t-out="0"/>
+        </div>
+
+        <div class="footer o_standard_footer">
+            <div style="color:#427DAC;">
+                <div>
+                    <span style="padding-left: 30px;"><strong>MountSol (www.mountsol.com)</strong>
+                    </span>
+                    <span style="padding-right: 55px; float:right;">
+                        <strong>Contact: </strong>
+                        +923414891548
+                    </span>
+                </div>
+                <div>
+
+                    <span style="padding-right: 17px; float:right;"><strong>Email: </strong>akbarusman0@gmail.com
+                    </span>
+                </div>
+                <div>
+                    <span style="padding-left: 30px;"><strong>Location: </strong>OPF Society House No. 175/C 2nd Floor
+                    </span>
+
+                </div>
+
+            </div>
+        </div>
+    </template>
+</odoo>

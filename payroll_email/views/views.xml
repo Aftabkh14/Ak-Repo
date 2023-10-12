@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--        <report-->
+<!--                id="action_report_payroll"-->
+<!--                model="hr.payslip"-->
+<!--                string="Payslip"-->
+<!--                report_type="qweb-pdf"-->
+<!--                name="payroll_email.report_generate_employee_offer_letter"-->
+<!--                file="payroll_email.report_generate_employee_offer_letter"-->
+
+        <record id="action_report_payroll" model="ir.actions.report">
+        <field name="name">Payslip</field>
+        <field name="model">hr.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">payroll_email.report_generate_employee_offer_letter</field>
+        <field name="report_file">payroll_email.report_generate_employee_offer_letter</field>
+            <field name="binding_model_id" ref="model_hr_payslip"/>
+
+        <field name="binding_type">report</field>
+    </record>
+
+
+<!--    <record id="res_config_setting_advance_salary" model="ir.ui.view">-->
+<!--        <field name="name">res.config.settings.view.form.inherit.payroll</field>-->
+<!--        <field name="model">res.config.settings</field>-->
+<!--        <field name="priority" eval="45"/>-->
+<!--        <field name="inherit_id" ref="hr_payroll.res_config_settings_view_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//div[hasclass('settings')]" position="inside">-->
+<!--                <div class="app_settings_block" string="Advance Salary" data-key="hr_payroll"-->
+<!--                     groups="hr_payroll.group_hr_payroll_manager">-->
+<!--                    <h2>Advance Salary</h2>-->
+<!--                    <div class="row mt16 o_settings_container">-->
+<!--                        <div class="col-lg-6 col-12 o_setting_box">-->
+<!--                            <label for="coa_for_advance_salary_id" string="Advance Salary COA"/>-->
+<!--                            <field name="coa_for_advance_salary_id" string="Advance Salary COA"/>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="res_config_setting_advance_salary" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.payroll</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="45"/>
+            <field name="inherit_id" ref="hr_payroll.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-key="advance_salary"
+                         groups="hr_payroll.group_hr_payroll_employee_manager">
+                        <h2>Advance Salary</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-lg-6 col-12 o_setting_box">
+                                <label for="coa_for_advance_salary_id" string="Advance Salary COA"/>
+                                <field name="coa_for_advance_salary_id" string="Advance Salary COA"/>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+    <record id="view_account_advance_payment_tree" model="ir.ui.view">
+        <field name="name">advance.salary.account.tree</field>
+        <field name="model">advance.salary.account</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" delete="false">
+                <field name="date" attrs="{'readonly': [('journal_state', '=', 'mail')]}"/>
+                <field name="journal_id"  domain="[('type', 'in', ('bank', 'cash'))]" attrs="{'readonly': [('journal_state', '=', 'mail')]}"/>
+                <field name="partner_id" attrs="{'readonly': [('journal_state', '=', 'mail')]}"/>
+                <field name="amount" attrs="{'readonly': [('journal_state', '=', 'mail')]}"/>
+                <field name="journal_entry_reference" readonly="1" />
+                <field name="journal_state" invisible="1"  />
+                  <button name="action_create_journal"
+                    type="object" string="Post"  attrs="{'invisible': [('journal_state', '!=', 'post')]}"
+                   />
+                <button name="action_send_advance_salary_mail"
+                    type="object" string="Request"  attrs="{'invisible': [('journal_state', '=', 'post')]}"
+                   />
+                <button name="action_send_advance_salary_mail_approved"
+                    type="object" string="Send"  attrs="{'invisible': [('journal_state', '=', 'post')]}"
+                   />
+                <button name="action_delete"
+                    type="object" string="Delete"  attrs="{'invisible': [('journal_entry_reference', '!=', False)]}"
+                   />
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_advance_salary" model="ir.actions.act_window">
+        <field name="name">Advance Salary</field>
+        <field name="res_model">advance.salary.account</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_account_advance_payment_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Register a Advance Salary
+            </p>
+            <p>
+                Advance Salary are given to employees to support there financial needs . You can process those payments by your own means or
+                by using installed facilities.
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="menu_action_advance_salary" action="action_advance_salary"
+              parent="hr_payroll.menu_hr_payroll_payslips"
+              sequence="20"/>
+
+
+    <data>
+        <record id="action_report_delivery" model="ir.actions.report">
+            <field name="name">Pay Roll Email</field>
+            <field name="model">hr.payslip</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">payroll_email.report_payroll</field>
+            <field name="report_file">payroll_email.report_payroll</field>
+            <field name="print_report_name">'Salary Slip - %s - %s' % (object.partner_id.name or '', object.name)
+            </field>
+            <field name="binding_model_id" ref="model_hr_payslip"/>
+            <field name="binding_type">report</field>
+        </record>
+        <!-- Define the custom button -->
+        <record id="view_payslip_form_custom" model="ir.ui.view">
+            <field name="name">hr.payslip.form.custom</field>
+            <field name="model">hr.payslip</field>
+            <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='refund_sheet']" position="before">
+                    <button name="action_generate_payroll_report" string="Generate Payroll Report"
+                            type="object" class="oe_highlight"/>
+                </xpath>
+            </field>
+        </record>
+
+<!--                        View for Creating new stages       -->
+
+<!--        <record id="project_form_id" model="ir.ui.view">-->
+<!--            <field name="name">project.inherit</field>-->
+<!--            <field name="model">project.project</field>-->
+<!--            <field name="inherit_id" ref="project.edit_project"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <xpath expr="//form/header">-->
+<!--                    <button name="create_stages"-->
+<!--                            string="Create Stages" type="object" class="btn-primary"/>-->
+<!--                </xpath>-->
+<!--            </field>-->
+<!--        </record>-->
+
+    </data>
+
+
+
+
+</odoo>
